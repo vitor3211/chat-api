@@ -1,4 +1,4 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.response;
 
 import java.time.LocalDate;
 
@@ -17,6 +17,7 @@ public class UserResponseDto {
     private Long id;
     private String name;
     private String email;
+    private String token;
     private LocalDate dateOfBirth;
 
     public UserResponseDto(User user){

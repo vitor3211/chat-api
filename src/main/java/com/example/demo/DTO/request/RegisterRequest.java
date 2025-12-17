@@ -1,4 +1,4 @@
-package com.example.demo.DTO;
+package com.example.demo.DTO.request;
 
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserRequestDto {
+public class registerRequest {
 
     @NotBlank(message = "Name is required!")
     @Size(min = 4, max = 50 ,message = "Invalid name length!")
@@ -28,9 +28,12 @@ public class UserRequestDto {
     @NotBlank(message = "Email is required!")
     private String email;
 
+    @NotBlank(message = "Password is required!")
+    private String password;
+
     private LocalDate dateOfBirth;
 
-    public UserRequestDto(User user){
+    public registerRequest(User user){
             BeanUtils.copyProperties(user, this);
     }
 
