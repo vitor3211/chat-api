@@ -2,6 +2,7 @@ package com.example.demo.DTO.request;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
 
 import com.example.demo.entity.User;
@@ -18,10 +19,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class registerRequest {
+public class RegisterRequest {
 
     @NotBlank(message = "Name is required!")
-    @Size(min = 4, max = 50 ,message = "Invalid name length!")
+    @Size(min = 6, max = 50 ,message = "Invalid name length!")
     private String name;
 
     @Email(message = "Invalid email!")
@@ -29,12 +30,7 @@ public class registerRequest {
     private String email;
 
     @NotBlank(message = "Password is required!")
+    @Size(min = 6, max = 50, message = "Invalid password length!")
     private String password;
-
-    private LocalDate dateOfBirth;
-
-    public registerRequest(User user){
-            BeanUtils.copyProperties(user, this);
-    }
 
 }

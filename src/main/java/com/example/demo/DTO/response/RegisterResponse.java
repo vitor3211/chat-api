@@ -2,6 +2,7 @@ package com.example.demo.DTO.response;
 
 import java.time.LocalDate;
 
+import com.example.demo.DTO.request.VerifyRequest;
 import org.springframework.beans.BeanUtils;
 import com.example.demo.entity.User;
 import lombok.AllArgsConstructor;
@@ -13,14 +14,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserResponseDto {
-    private Long id;
+public class RegisterResponse {
+
     private String name;
     private String email;
-    private String token;
-    private LocalDate dateOfBirth;
 
-    public UserResponseDto(User user){
-            BeanUtils.copyProperties(user, this);
+    public RegisterResponse(User user){
+        BeanUtils.copyProperties(user, this);
     }
+
 }

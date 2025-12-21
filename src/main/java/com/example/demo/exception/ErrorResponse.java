@@ -14,5 +14,4 @@ public class ErrorResponse {
     private final Throwable throwable;
     private final HttpStatus httpStatus;
     private final String path;
-
 }
