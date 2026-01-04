@@ -1,5 +1,6 @@
 package com.example.demo.security;
 
+import com.example.demo.repository.UserRepository;
 import com.example.demo.security.token.JWTUserData;
 import com.example.demo.security.token.TokenConfig;
 import jakarta.servlet.FilterChain;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,10 +19,13 @@ import java.util.Optional;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
-    private final TokenConfig tokenConfig;
 
-    public SecurityFilter(TokenConfig tokenConfig){
+    private final TokenConfig tokenConfig;
+    private final UserRepository userRepository;
+
+    public SecurityFilter(TokenConfig tokenConfig, UserRepository userRepository){
         this.tokenConfig = tokenConfig;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -32,10 +37,11 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if(optUser.isPresent()) {
                 JWTUserData userData = optUser.get();
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userData, null, null);
+                UserDetails user = userRepository.findByEmail(userData.email()).get();
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userData, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-                filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
         } else{
             filterChain.doFilter(request, response);
         }

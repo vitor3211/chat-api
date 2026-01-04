@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import com.example.demo.entity.enums.UserRole;
 import jakarta.persistence.*;
 import org.springframework.beans.BeanUtils;
 import com.example.demo.DTO.request.RegisterRequest;
@@ -17,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -50,12 +53,10 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private boolean verified;
 
-    //@ManyToMany(fetch = FetchType.EAGER)
-   //private Set<Role> roles;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole userRole;
 
-    public User(RegisterResponse registerResponse){
-            BeanUtils.copyProperties(registerResponse, this);
-    }
     public User(RegisterRequest registerRequest){
             BeanUtils.copyProperties(registerRequest, this);
     }
@@ -63,7 +64,8 @@ public class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        if(this.userRole == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

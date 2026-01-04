@@ -6,6 +6,7 @@ import com.example.demo.DTO.response.RegisterResponse;
 import com.example.demo.entity.UpdatePassword;
 import com.example.demo.entity.UserVerify;
 import com.example.demo.entity.User;
+import com.example.demo.entity.enums.UserRole;
 import com.example.demo.exception.UserAlreadyExistsException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.exception.UserNotVerifiedException;
@@ -56,7 +57,7 @@ public class UserAuthService {
                     .issuer("mybackend")
                     .subject(user.getId().toString())
                     .issuedAt(Instant.now())
-                    .expiresAt(Instant.now().plusSeconds(300))
+                    .expiresAt(Instant.now().plusSeconds(600))
                     .build();
             var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
@@ -68,13 +69,14 @@ public class UserAuthService {
     
     public String register(RegisterRequest registerRequest){
         User user = new User(registerRequest);
-        user.setCreationDate(LocalDateTime.now());
         if(userRepository.existsByName(user.getName())){
             throw new UserAlreadyExistsException("This name is already in use!");
         }
         if(userRepository.existsByEmail(user.getEmail())){
             throw new UserAlreadyExistsException("This email is already in use!");
         }
+        user.setCreationDate(LocalDateTime.now());
+        user.setUserRole(UserRole.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setVerified(false);
         userRepository.save(user);
