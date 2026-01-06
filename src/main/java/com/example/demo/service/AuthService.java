@@ -13,7 +13,6 @@ import com.example.demo.exception.UserNotVerifiedException;
 import com.example.demo.repository.UpdatePasswordRepository;
 import com.example.demo.repository.UserVerifyRepository;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.security.token.TokenConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-public class UserAuthService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,7 +37,7 @@ public class UserAuthService {
     private final JwtEncoder jwtEncoder;
     private final UserVerifyRepository userVerifyRepository;
 
-    public UserAuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailService emailService, UpdatePasswordRepository updatePasswordRepository, JwtEncoder jwtEncoder ,UserVerifyRepository userVerifyRepository){
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailService emailService, UpdatePasswordRepository updatePasswordRepository, JwtEncoder jwtEncoder , UserVerifyRepository userVerifyRepository){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -92,14 +91,16 @@ public class UserAuthService {
 
     public RegisterResponse verifyEmail(VerifyRequest verifyRequest){
         UserVerify userVerify = userVerifyRepository.findByEmailAndToken(verifyRequest.email(), verifyRequest.token()).orElseThrow(() -> new UserNotFoundException("User not found!"));
-        if(userVerify.getExpires().isBefore(LocalDateTime.now().plusMinutes(15))){
-            User user = userRepository.findByEmail(verifyRequest.email()).get();
-            user.setVerified(true);
+        if(userVerify.getExpires().isBefore(LocalDateTime.now())){
+            User user = userRepository.findByEmail(userVerify.getEmail()).get();
             userVerifyRepository.delete(userVerify);
-            return new RegisterResponse(user);
-        } else{
+            userRepository.delete(user);
             throw new RuntimeException("Tempo expirado!");
         }
+        User user = userRepository.findByEmail(verifyRequest.email()).get();
+        user.setVerified(true);
+        userVerifyRepository.delete(userVerify);
+        return new RegisterResponse(user);
     }
 
     public String requestUpdate(EmailRequest emailRequest){
@@ -117,6 +118,10 @@ public class UserAuthService {
     
     public String updatePassword(PasswordRequest passwordRequest, String id){
         UpdatePassword updatePassword = updatePasswordRepository.findById(UUID.fromString(id)).orElseThrow(() -> new UserNotFoundException("em construção"));
+        if(!(updatePassword.getExpires().isBefore(LocalDateTime.now()))){
+            updatePasswordRepository.delete(updatePassword);
+            throw new RuntimeException();
+        }
         User user = userRepository.findByEmail(updatePassword.getEmail()).get();
         user.setPassword(passwordEncoder.encode(passwordRequest.password()));
         userRepository.save(user);

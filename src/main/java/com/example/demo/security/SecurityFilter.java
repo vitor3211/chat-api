@@ -30,6 +30,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         String authorizedHeader = request.getHeader("Authorization");
         if(Strings.isNotEmpty(authorizedHeader) && authorizedHeader.startsWith("Bearer ")){
             String token = authorizedHeader.substring("Bearer ".length());
