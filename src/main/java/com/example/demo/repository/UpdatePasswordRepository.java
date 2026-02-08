@@ -14,7 +14,7 @@ public interface UpdatePasswordRepository extends JpaRepository<UpdatePassword,U
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM public.update_password WHERE expires < NOW();", nativeQuery = true)
+    @Query(value = "DELETE FROM public.password_reset WHERE expires < NOW();", nativeQuery = true)
     void deleteNonVerifiedUsers();
 
 }

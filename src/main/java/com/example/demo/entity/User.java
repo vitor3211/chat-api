@@ -1,23 +1,18 @@
 package com.example.demo.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;
 import jakarta.persistence.*;
-import org.springframework.beans.BeanUtils;
-import com.example.demo.DTO.request.RegisterRequest;
-import com.example.demo.DTO.response.RegisterResponse;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +22,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @Setter
 public class User implements UserDetails{
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -43,10 +40,9 @@ public class User implements UserDetails{
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required!")
-    @Column(nullable = false)
     private String password;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime creationDate;
 
@@ -57,10 +53,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private UserRole userRole;
 
-    public User(RegisterRequest registerRequest){
-            BeanUtils.copyProperties(registerRequest, this);
-    }
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserProvider userProvider;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -70,7 +65,7 @@ public class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return "";
+        return name;
     }
 
     @Override

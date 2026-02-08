@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.config;
 
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.repository.UserRepository;

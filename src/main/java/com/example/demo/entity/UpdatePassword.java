@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "updatePassword")
+@Table(name = "password_reset")
 @NoArgsConstructor
 @Getter
 @Setter

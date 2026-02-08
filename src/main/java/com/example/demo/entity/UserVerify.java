@@ -26,9 +26,6 @@ public class UserVerify {
     private String email;
 
     @Column(nullable = false)
-    private String encryptedPassword;
-
-    @Column(nullable = false)
     private String token;
 
     @Column(nullable = false)

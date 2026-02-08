@@ -2,45 +2,68 @@ package com.example.demo.controller;
 
 import com.example.demo.DTO.request.*;
 import com.example.demo.DTO.response.LoginResponse;
-import com.example.demo.DTO.response.RegisterResponse;
+import com.example.demo.DTO.response.MessageResponse;
+import com.example.demo.DTO.response.VerifyResponse;
 import com.example.demo.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(AuthService authService){
         this.authService = authService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request){
+        try{
+            String ip = request.getHeader("X-Forwarded-For"); // se estiver atrás de proxy/load balancer
+            if (ip == null || ip.isEmpty()) {
+                ip = request.getRemoteAddr(); // fallback
+            }
+            String clientIp = ip.split(",")[0].trim();
+            logger.info("Tentativa de login para: {} com ip: {}", loginRequest.email(), clientIp);
+        } catch (Exception e) {
+            throw new RuntimeException("Deu erro");
+        }
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
+        logger.info("Tentativa de registro para usuário: {}, {}", registerRequest.name(), registerRequest.email());
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<RegisterResponse> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest){
+    public ResponseEntity<VerifyResponse> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest){
         return ResponseEntity.ok(authService.verifyEmail(verifyRequest));
     }
 
+    @PostMapping("/resendEmail")
+    public ResponseEntity<MessageResponse> resendEmail(@Valid @RequestBody EmailRequest emailRequest){
+        return ResponseEntity.ok(authService.resendEmail(emailRequest));
+    }
     @PostMapping("/updatepassword")
-    public ResponseEntity<String> requestUpdate(@Valid @RequestBody EmailRequest emailRequest){
+    public ResponseEntity<MessageResponse> requestUpdate(@Valid @RequestBody EmailRequest emailRequest){
         return ResponseEntity.ok(authService.requestUpdate(emailRequest));
     }
 
     @PutMapping("/updatepassword/{uuid}")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody PasswordRequest password, @PathVariable String uuid){
+    public ResponseEntity<MessageResponse> updatePassword(@Valid @RequestBody PasswordRequest password, @PathVariable String uuid){
         return ResponseEntity.ok(authService.updatePassword(password, uuid));
     }
 }
