@@ -1,10 +1,18 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.request.UserRequest;
+import com.example.demo.DTO.response.MessageResponse;
+import com.example.demo.DTO.response.UserResponse;
 import com.example.demo.service.AdminService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -15,8 +23,28 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @PostMapping("/createUser")
-    public String createUser(){
-        return adminService.ola();
+    @GetMapping("/listAll")
+    public ResponseEntity<List<UserResponse>> ListAllUsers(){
+        return ResponseEntity.ok(adminService.listAllUsers());
+    }
+
+    //pensar nisso depois
+//    @PostMapping("/createUser")
+//    public String createUser(@Valid ){
+//        return adminService.ola();
+//    }
+
+    @PutMapping("/updateUser/{uuid}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody UserRequest userRequest){
+        log.info("Updating user with id: {}", uuid);
+        return ResponseEntity.ok(adminService.updateUser(uuid, userRequest));
+    }
+
+    @DeleteMapping("/deleteUser/{uuid}")
+    public ResponseEntity<MessageResponse> DeleteUserById(@PathVariable UUID uuid){
+        log.info("Deleting user with id: {}", uuid);
+        return ResponseEntity.ok(adminService.deleteUserById(uuid));
     }
 }
