@@ -17,7 +17,11 @@ public interface UserMapper {
     @Mapping(target = "name", source = "name")
     VerifyResponse toVerifyResponse(User user);
 
-    void updateUserFromDto(UserRequest userRequest, @MappingTarget User user);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "verified", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
+    void updateUserFromDto(UserRequest dto, @MappingTarget User user);
 
     UserResponse toUserResponse(User user);
 

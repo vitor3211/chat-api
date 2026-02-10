@@ -32,4 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### Log path ###
 logs
+
+### Images ###
+uploads

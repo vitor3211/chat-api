@@ -11,17 +11,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(AuthService authService){
         this.authService = authService;
@@ -35,7 +34,7 @@ public class AuthController {
                 ip = request.getRemoteAddr(); // fallback
             }
             String clientIp = ip.split(",")[0].trim();
-            logger.info("Tentativa de login para: {} com ip: {}", loginRequest.email(), clientIp);
+            log.info("Tentativa de login para: {} com ip: {}", loginRequest.email(), clientIp);
         } catch (Exception e) {
             throw new RuntimeException("Deu erro");
         }
@@ -44,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
-        logger.info("Tentativa de registro para usuário: {}, {}", registerRequest.name(), registerRequest.email());
+        log.info("Tentativa de registro para usuário: {}, {}", registerRequest.name(), registerRequest.email());
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
