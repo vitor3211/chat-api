@@ -24,6 +24,12 @@ public class RateLimiterFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String ip = request.getRemoteAddr();
         log.info("IP Address {}: ", ip);
 
@@ -37,10 +43,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
     }
 
     private Bucket newBucket(String ip){
-        Bandwidth limit = Bandwidth.builder()
-                .capacity(5)
-                .refillIntervally(5, Duration.ofSeconds(30))
-                .build();
+        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofSeconds(30)));
         return Bucket.builder().addLimit(limit).build();
     }
 }

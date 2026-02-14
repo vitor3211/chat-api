@@ -79,7 +79,8 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password!");
         }
     }
-    
+
+    //corrigir envio de email na hora da apresentação
     public MessageResponse register(RegisterRequest registerRequest){
         User user = new User();
         user.setName(registerRequest.name());
