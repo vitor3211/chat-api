@@ -13,7 +13,4 @@ CREATE TABLE IF NOT EXISTS public.tb_users
     CONSTRAINT ukt5xrb42j5hy9f23bwrf2tlpgu UNIQUE (name),
     CONSTRAINT tb_users_user_provider_check CHECK (user_provider::text = ANY (ARRAY['LOCAL'::character varying, 'GOOGLE'::character varying]::text[])),
     CONSTRAINT tb_users_user_role_check CHECK (user_role::text = ANY (ARRAY['ADMIN'::character varying, 'USER'::character varying]::text[]))
-    )
-
-ALTER TABLE IF EXISTS public.tb_users
-    OWNER to postgres;
+    );
