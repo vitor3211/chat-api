@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     @GetMapping
-    public void oi(){
-        System.out.println("Hello, World!");
+    public String oi(){
+        return "Hello, World!";
     }
 }

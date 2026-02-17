@@ -21,8 +21,17 @@ public interface UserMapper {
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "verified", ignore = true)
     @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "imageProfileUrl", ignore = true)
     void updateUserFromDto(UserRequest dto, @MappingTarget User user);
 
     UserResponse toUserResponse(User user);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "verified", ignore = true)
+    @Mapping(target = "userRole", ignore = true)
+    @Mapping(target = "userProvider", ignore = true)
+    @Mapping(target = "imageProfileUrl", ignore = true)
+    User toEntity(RegisterRequest registerRequest);
 
 }

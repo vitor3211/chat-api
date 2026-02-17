@@ -57,6 +57,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private UserProvider userProvider;
 
+    @Column(nullable = false)
+    private String imageProfileUrl;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(this.userRole == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));

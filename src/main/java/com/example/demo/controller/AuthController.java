@@ -1,14 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.DTO.request.*;
-import com.example.demo.DTO.response.LoginResponse;
+import com.example.demo.DTO.response.AuthorizationResponse;
 import com.example.demo.DTO.response.MessageResponse;
 import com.example.demo.DTO.response.VerifyResponse;
 import com.example.demo.service.AuthService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.example.demo.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenService tokenService;
 
-    public AuthController(AuthService authService){
+    public AuthController(AuthService authService, TokenService tokenService){
         this.authService = authService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request){
+    public ResponseEntity<AuthorizationResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request){
         try{
-            String ip = request.getHeader("X-Forwarded-For"); // se estiver atrás de proxy/load balancer
+            String ip = request.getHeader("X-Forwarded-For");
             if (ip == null || ip.isEmpty()) {
-                ip = request.getRemoteAddr(); // fallback
+                ip = request.getRemoteAddr();
             }
             String clientIp = ip.split(",")[0].trim();
             log.info("Tentativa de login para: {} com ip: {}", loginRequest.email(), clientIp);
@@ -64,5 +63,10 @@ public class AuthController {
     @PutMapping("/updatepassword/{uuid}")
     public ResponseEntity<MessageResponse> updatePassword(@Valid @RequestBody PasswordRequest password, @PathVariable String uuid){
         return ResponseEntity.ok(authService.updatePassword(password, uuid));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthorizationResponse> refresh(@RequestBody RefreshRequest refreshToken){
+        return ResponseEntity.ok(tokenService.refresh(refreshToken));
     }
 }

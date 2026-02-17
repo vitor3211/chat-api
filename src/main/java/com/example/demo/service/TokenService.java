@@ -54,15 +54,6 @@ public class TokenService {
         return refreshToken;
     }
 
-    //ajustar logica dos dois
-    public void verifyExpiration(RefreshToken refreshToken){
-        if(refreshToken.getExpires().isBefore(Instant.now())){
-            refreshTokenRepository.delete(refreshToken);
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-        return;
-    }
-
     public AuthorizationResponse refresh(RefreshRequest refreshToken){
         RefreshToken oldToken = refreshTokenRepository.findByToken(refreshToken.refreshToken()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token!"));
         if(oldToken.getExpires().isBefore(Instant.now())){
