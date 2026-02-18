@@ -1,6 +1,8 @@
 package com.example.demo.security;
 
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -39,13 +41,13 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private final UserRepository userRepository;
-    @Value("${jwt.private.key}")
-    private RSAPrivateKey privateKey;
-    @Value("${jwt.public.key}")
-    private RSAPublicKey publicKey;
+    private final ObjectMapper objectMapper;
+    private final TokenService tokenService;
 
-    public WebSecurityConfig(UserRepository userRepository) {
+    public WebSecurityConfig(UserRepository userRepository, ObjectMapper objectMapper, TokenService tokenService) {
         this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
+        this.tokenService = tokenService;
     }
 
     @Bean
@@ -64,7 +66,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(
-                        oauth2 -> oauth2.successHandler(new OAuth2SuccessHandler(jwtEncoder(), userRepository))
+                        oauth2 -> oauth2.successHandler(new OAuth2SuccessHandler(tokenService, userRepository, objectMapper))
                 )
                 .oauth2ResourceServer(oauth02 -> oauth02.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();
@@ -91,18 +93,6 @@ public class WebSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public JwtEncoder jwtEncoder(){
-        JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(privateKey).build();
-        var jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder(){
-        return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
     @Bean

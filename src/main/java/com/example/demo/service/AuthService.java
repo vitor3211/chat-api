@@ -62,6 +62,7 @@ public class AuthService {
             RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
             return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L);
+
         } catch(BadCredentialsException e){
             throw new BadCredentialsException("Invalid email or password!");
         }

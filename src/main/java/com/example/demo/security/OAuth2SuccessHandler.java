@@ -1,9 +1,13 @@
 package com.example.demo.security;
 
+import com.example.demo.DTO.response.AuthorizationResponse;
+import com.example.demo.entity.RefreshToken;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -20,12 +24,14 @@ import java.util.List;
 
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private final JwtEncoder jwtEncoder;
+    private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
-    public OAuth2SuccessHandler(JwtEncoder jwtEncoder, UserRepository userRepository) {
-        this.jwtEncoder = jwtEncoder;
+    public OAuth2SuccessHandler(TokenService tokenService, UserRepository userRepository, ObjectMapper objectMapper) {
+        this.tokenService = tokenService;
         this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -44,24 +50,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     newUser.setUserProvider(UserProvider.GOOGLE);
                     newUser.setCreationDate(LocalDateTime.now());
                     newUser.setVerified(true);
+                    newUser.setImageProfileUrl(oidcUser.getPicture());
                     return userRepository.save(newUser);
                 });
 
-        List<String> roles = user.getAuthorities().stream()
-                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                .toList();
+        String jwtValue = tokenService.generateToken(user);
+        RefreshToken refreshToken = tokenService.generateRefreshToken(user);
+        AuthorizationResponse authResponse = new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L);
 
-        var claims = JwtClaimsSet.builder()
-                .issuer("mybackend")
-                .subject(user.getId().toString())
-                .claim("roles", roles)
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(600))
-                .build();
-
-        String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().write("{\"token\":\"" + jwtValue + "\"}");
+        objectMapper.writeValue(response.getWriter(), authResponse);
+
     }
 }
