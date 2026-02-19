@@ -106,7 +106,7 @@ public class AuthService {
         return new MessageResponse("Verification email resent successfully");
     }
 
-    public VerifyResponse verifyEmail(VerifyRequest verifyRequest){
+    public AuthorizationResponse verifyEmail(VerifyRequest verifyRequest){
         UserVerify userVerify = emailRequestRepository.findByToken( verifyRequest.token()).orElseThrow(() -> new UserNotFoundException("User not found!"));
         if(userVerify.getExpires().isBefore(LocalDateTime.now())){
             User user = userRepository.findByEmail(userVerify.getEmail()).orElseThrow(() -> new UserNotFoundException("Invalid email!"));
@@ -114,10 +114,14 @@ public class AuthService {
             userRepository.delete(user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification link expired!");
         }
+
         User user = userRepository.findByEmail(userVerify.getEmail()).orElseThrow(() -> new UserNotFoundException("Invalid email!"));
         user.setVerified(true);
         emailRequestRepository.delete(userVerify);
-        return userMapper.toVerifyResponse(user);
+        String token = tokenService.generateToken(user);
+        RefreshToken refreshToken = tokenService.generateRefreshToken(user);
+
+        return new AuthorizationResponse(token, refreshToken.getToken(), 900L);
     }
 
     public MessageResponse requestUpdate(EmailRequest emailRequest){

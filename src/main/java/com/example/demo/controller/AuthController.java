@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.DTO.request.*;
 import com.example.demo.DTO.response.AuthorizationResponse;
 import com.example.demo.DTO.response.MessageResponse;
-import com.example.demo.DTO.response.VerifyResponse;
 import com.example.demo.service.AuthService;
 import com.example.demo.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<VerifyResponse> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest){
+    public ResponseEntity<AuthorizationResponse> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest){
         return ResponseEntity.ok(authService.verifyEmail(verifyRequest));
     }
 
