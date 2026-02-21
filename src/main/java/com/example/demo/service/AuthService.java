@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.DTO.request.*;
 import com.example.demo.DTO.response.AuthorizationResponse;
 import com.example.demo.DTO.response.MessageResponse;
-import com.example.demo.DTO.response.VerifyResponse;
 import com.example.demo.entity.RefreshToken;
 import com.example.demo.entity.UpdatePassword;
 import com.example.demo.entity.UserVerify;

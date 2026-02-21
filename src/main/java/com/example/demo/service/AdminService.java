@@ -4,7 +4,6 @@ import com.example.demo.DTO.request.RegisterRequest;
 import com.example.demo.DTO.request.UserRequest;
 import com.example.demo.DTO.response.MessageResponse;
 import com.example.demo.DTO.response.UserResponse;
-import com.example.demo.DTO.response.VerifyResponse;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserRole;
 import com.example.demo.exception.UserNotFoundException;
@@ -45,7 +44,7 @@ public class AdminService {
         return userMapper.toUserResponse(user);
     }
 
-    public VerifyResponse createUser(RegisterRequest registerRequest){
+    public String createUser(RegisterRequest registerRequest){
         try{
             User user = new User();
             user.setName(registerRequest.name());
@@ -54,9 +53,9 @@ public class AdminService {
             user.setUserRole(UserRole.USER);
             user.setVerified(true);
             userRepository.save(user);
-            return userMapper.toVerifyResponse(user);
+            return "User Created!";
         } catch (Exception e) {
-            throw new RuntimeException("");
+            throw new RuntimeException("Error");
         }
     }
 
