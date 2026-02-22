@@ -15,13 +15,17 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UpdatePassword {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID password_id;
 
-    @Email
-    @Column(nullable = false)
-    private String email;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false, unique = true)
+    private String token;
 
     @Column(nullable = false)
     private LocalDateTime expires;

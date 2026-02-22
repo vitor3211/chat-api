@@ -54,6 +54,7 @@ public class AuthController {
     public ResponseEntity<MessageResponse> resendEmail(@Valid @RequestBody EmailRequest emailRequest){
         return ResponseEntity.ok(authService.resendEmail(emailRequest));
     }
+
     @PostMapping("/updatepassword")
     public ResponseEntity<MessageResponse> requestUpdate(@Valid @RequestBody EmailRequest emailRequest){
         return ResponseEntity.ok(authService.requestUpdate(emailRequest));

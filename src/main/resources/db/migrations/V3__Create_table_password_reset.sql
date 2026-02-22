@@ -1,7 +1,11 @@
 CREATE TABLE IF NOT EXISTS public.password_reset
 (
-    password_id uuid NOT NULL,
-    email character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    expires timestamp(6) without time zone NOT NULL,
-    CONSTRAINT password_reset_pkey PRIMARY KEY (password_id)
+    password_id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL,
+    token varchar(255) NOT NULL UNIQUE,
+    expires timestamp(6) NOT NULL,
+    CONSTRAINT fk_password_reset_user
+    FOREIGN KEY(user_id)
+    REFERENCES public.users(id)
+    ON DELETE CASCADE
     );
