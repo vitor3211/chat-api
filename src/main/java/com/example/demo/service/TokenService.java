@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.DTO.request.RefreshRequest;
 import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.entity.RefreshToken;
+import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.User;
 import com.example.demo.repository.RefreshTokenRepository;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,7 @@ public class TokenService {
     }
 
     public AuthorizationResponse refresh(RefreshRequest refreshToken){
-        RefreshToken oldToken = refreshTokenRepository.findByToken(refreshToken.refreshToken()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token!"));
+        RefreshToken oldToken = refreshTokenRepository.findByToken(refreshToken.refreshToken()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tokens!"));
         if(oldToken.getExpires().isBefore(Instant.now())){
             refreshTokenRepository.delete(oldToken);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

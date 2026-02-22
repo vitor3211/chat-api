@@ -1,6 +1,6 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.UserVerify;
+import com.example.demo.entity.tokens.UserVerify;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

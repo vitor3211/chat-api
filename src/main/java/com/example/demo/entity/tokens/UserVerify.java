@@ -1,7 +1,8 @@
-package com.example.demo.entity;
+package com.example.demo.entity.tokens;
 
+import com.example.demo.entity.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,15 +11,15 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "password_reset")
+@Table(name = "email_verification")
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class UpdatePassword {
-
+public class UserVerify {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID password_id;
+    private UUID email_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

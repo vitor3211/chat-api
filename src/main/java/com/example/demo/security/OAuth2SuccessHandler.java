@@ -1,7 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.entity.RefreshToken;
+import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;
@@ -10,17 +10,12 @@ import com.example.demo.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 

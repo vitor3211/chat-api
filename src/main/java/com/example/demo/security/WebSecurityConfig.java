@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                         .requestMatchers( "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
+                        .requestMatchers("/gs-guide-websocket/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/auth/updatepassword/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
