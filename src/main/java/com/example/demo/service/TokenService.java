@@ -2,8 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.DTO.request.RefreshRequest;
 import com.example.demo.DTO.response.AuthorizationResponse;
+import com.example.demo.DTO.response.UserLoginResponse;
 import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.User;
+import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.RefreshTokenRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,10 +25,12 @@ public class TokenService {
 
     private final JwtEncoder jwtEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserMapper userMapper;
 
-    public TokenService(JwtEncoder jwtEncoder, RefreshTokenRepository refreshTokenRepository){
+    public TokenService(JwtEncoder jwtEncoder, RefreshTokenRepository refreshTokenRepository, UserMapper userMapper){
         this.jwtEncoder = jwtEncoder;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userMapper = userMapper;
     }
 
     public String generateToken(User user){
@@ -60,11 +64,13 @@ public class TokenService {
             refreshTokenRepository.delete(oldToken);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        String newAcessToken = generateToken(oldToken.getUser());
+        User user = oldToken.getUser();
+        UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
+        String newAcessToken = generateToken(user);
         RefreshToken newRefreshToken = generateRefreshToken(oldToken.getUser());
         refreshTokenRepository.save(newRefreshToken);
         refreshTokenRepository.delete(oldToken);
-        return new AuthorizationResponse(newAcessToken, newRefreshToken.getToken(), 900L);
+        return new AuthorizationResponse(newAcessToken, newRefreshToken.getToken(), 900L, userResponse);
     }
 
 }

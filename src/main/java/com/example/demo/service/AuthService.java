@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.DTO.request.*;
 import com.example.demo.DTO.response.AuthorizationResponse;
 import com.example.demo.DTO.response.MessageResponse;
+import com.example.demo.DTO.response.UserLoginResponse;
 import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.tokens.UpdatePassword;
 import com.example.demo.entity.tokens.UserVerify;
@@ -57,10 +58,11 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(pass);
             User user = (User) authentication.getPrincipal();
 
+            UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
             String jwtValue = tokenService.generateToken(user);
             RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
-            return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L);
+            return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L, userResponse);
 
         } catch(BadCredentialsException e){
             throw new BadCredentialsException("Invalid email or password!");
@@ -112,13 +114,15 @@ public class AuthService {
             emailVerifyRepository.delete(userVerify);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification link expired!");
         }
+
         User user = userVerify.getUser();
         user.setVerified(true);
+        UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
         emailVerifyRepository.delete(userVerify);
         String token = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
-        return new AuthorizationResponse(token, refreshToken.getToken(), 900L);
+        return new AuthorizationResponse(token, refreshToken.getToken(), 900L, userResponse);
     }
 
     public MessageResponse requestUpdate(EmailRequest emailRequest){

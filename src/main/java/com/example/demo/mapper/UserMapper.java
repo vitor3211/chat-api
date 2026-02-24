@@ -2,6 +2,7 @@ package com.example.demo.mapper;
 
 import com.example.demo.DTO.request.RegisterRequest;
 import com.example.demo.DTO.request.UserRequest;
+import com.example.demo.DTO.response.UserLoginResponse;
 import com.example.demo.DTO.response.UserResponse;
 import com.example.demo.entity.User;
 import org.mapstruct.Mapper;
@@ -29,4 +30,6 @@ public interface UserMapper {
     @Mapping(target = "imageProfileUrl", ignore = true)
     User toEntity(RegisterRequest registerRequest);
 
+
+    UserLoginResponse toUserLoginResponse(User user);
 }
