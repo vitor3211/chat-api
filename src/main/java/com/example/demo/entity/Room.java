@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,9 +16,8 @@ public class Room {
 
     @Id
     private String id;
-
     private String roomID;
-
+    private List<String> participants = new ArrayList<>();
     private List<Message> messages = new ArrayList<>();
 
 }

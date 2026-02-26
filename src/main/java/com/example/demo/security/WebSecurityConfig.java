@@ -1,6 +1,5 @@
 package com.example.demo.security;
 
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.TokenService;
 import jakarta.servlet.DispatcherType;
@@ -29,12 +28,10 @@ public class WebSecurityConfig {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
-    private final UserMapper userMapper;
 
-    public WebSecurityConfig(UserRepository userRepository, TokenService tokenService, UserMapper userMapper) {
+    public WebSecurityConfig(UserRepository userRepository, TokenService tokenService) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
-        this.userMapper = userMapper;
     }
 
     @Bean
@@ -54,7 +51,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(
-                        oauth2 -> oauth2.successHandler(new OAuth2SuccessHandler(tokenService, userRepository, userMapper))
+                        oauth2 -> oauth2.successHandler(new OAuth2SuccessHandler(tokenService, userRepository))
                 )
                 .oauth2ResourceServer(oauth02 -> oauth02.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();

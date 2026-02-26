@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/room")
 public class RoomController {
 
-    private RoomService roomService;
+    private final RoomService roomService;
 
     public RoomController(RoomService roomService){
         this.roomService = roomService;
@@ -31,11 +31,11 @@ public class RoomController {
     }
 
     @GetMapping("/{roomID}/messages")
-    public ResponseEntity<List<Message>> getMessages(@PathVariable String id,
+    public ResponseEntity<List<Message>> getMessages(@PathVariable String roomID,
                                                      @RequestParam(value = "page", defaultValue = "0", required = false) int page,
                                                      @RequestParam(value = "size", defaultValue = "20", required = false) int size
                                                      ){
-        return ResponseEntity.ok(roomService.getMessages(id, page, size));
+        return ResponseEntity.ok(roomService.getMessages(roomID, page, size));
     }
 
 }

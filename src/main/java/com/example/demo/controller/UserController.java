@@ -1,17 +1,26 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.response.UserLoginResponse;
+import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/teste")
+@RequestMapping("/user")
 public class UserController {
 
-    @GetMapping
-    public String oi(){
-        return "Hello, World!";
+    private final UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserLoginResponse> me(Authentication authentication){
+        return ResponseEntity.ok(userService.me(authentication));
     }
 }

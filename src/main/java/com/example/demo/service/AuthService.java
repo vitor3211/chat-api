@@ -23,6 +23,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -58,11 +59,10 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(pass);
             User user = (User) authentication.getPrincipal();
 
-            UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
             String jwtValue = tokenService.generateToken(user);
             RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
-            return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L, userResponse);
+            return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L);
 
         } catch(BadCredentialsException e){
             throw new BadCredentialsException("Invalid email or password!");
@@ -117,12 +117,11 @@ public class AuthService {
 
         User user = userVerify.getUser();
         user.setVerified(true);
-        UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
         emailVerifyRepository.delete(userVerify);
         String token = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
 
-        return new AuthorizationResponse(token, refreshToken.getToken(), 900L, userResponse);
+        return new AuthorizationResponse(token, refreshToken.getToken(), 900L);
     }
 
     public MessageResponse requestUpdate(EmailRequest emailRequest){
@@ -151,6 +150,5 @@ public class AuthService {
         userRepository.save(user);
 
         return new MessageResponse("Password changed!");
-        
     }
 }

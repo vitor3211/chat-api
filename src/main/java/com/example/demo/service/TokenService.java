@@ -65,12 +65,11 @@ public class TokenService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         User user = oldToken.getUser();
-        UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
         String newAcessToken = generateToken(user);
         RefreshToken newRefreshToken = generateRefreshToken(oldToken.getUser());
         refreshTokenRepository.save(newRefreshToken);
         refreshTokenRepository.delete(oldToken);
-        return new AuthorizationResponse(newAcessToken, newRefreshToken.getToken(), 900L, userResponse);
+        return new AuthorizationResponse(newAcessToken, newRefreshToken.getToken(), 900L);
     }
 
 }

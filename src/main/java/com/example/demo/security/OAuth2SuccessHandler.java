@@ -1,16 +1,12 @@
 package com.example.demo.security;
 
 import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.DTO.response.UserLoginResponse;
 import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.TokenService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -24,12 +20,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
-    public OAuth2SuccessHandler(TokenService tokenService, UserRepository userRepository, UserMapper userMapper) {
+    public OAuth2SuccessHandler(TokenService tokenService, UserRepository userRepository) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
     }
 
     @Override
@@ -52,13 +46,24 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     return userRepository.save(newUser);
                 });
 
-        UserLoginResponse userResponse = userMapper.toUserLoginResponse(user);
-        String jwtValue = tokenService.generateToken(user);
+        String token = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
-        AuthorizationResponse authResponse = new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L, userResponse);
+        AuthorizationResponse authResponse = new AuthorizationResponse(token, refreshToken.getToken(), 900L);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        new ObjectMapper().writeValue(response.getWriter(), authResponse);
+        response.setContentType("text/html;charset=UTF-8");
+        String html = "<!DOCTYPE html><html><head><title>Autenticando...</title></head><body>" +
+                "<script type=\"text/javascript\">" +
+                "    const data = {" +
+                "        token: '" + token + "'," +
+                "        refreshToken: '" + refreshToken.getToken() + "'," +
+                "        expiresIn: 900" +
+                "    };" +
+                "    window.opener.postMessage(data, 'http://localhost:3000');" +
+                "    window.close();" +
+                "</script>" +
+                "</body></html>";
+
+        response.getWriter().write(html);
+        response.getWriter().flush();
     }
 }
