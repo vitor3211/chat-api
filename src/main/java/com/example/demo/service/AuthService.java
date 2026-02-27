@@ -1,9 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.request.*;
-import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.DTO.response.MessageResponse;
-import com.example.demo.DTO.response.UserLoginResponse;
+import com.example.demo.dto.request.*;
+import com.example.demo.dto.response.AuthorizationResponse;
+import com.example.demo.dto.response.MessageResponse;
 import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.tokens.UpdatePassword;
 import com.example.demo.entity.tokens.UserVerify;
@@ -23,7 +22,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -129,18 +127,20 @@ public class AuthService {
         if(!(user.isVerified())){
             throw new UserNotVerifiedException("Invalid email!");
         }
+
         UpdatePassword updatePassword = new UpdatePassword();
-        updatePassword.setToken(UUID.randomUUID().toString().replace("-","").substring(0,8));
+        updatePassword.setToken(UUID.randomUUID().toString());
         updatePassword.setExpires(LocalDateTime.now().plusMinutes(15));
         updatePassword.setUser(user);
         updatePasswordRepository.save(updatePassword);
 
-        System.out.println(updatePassword.getPassword_id());
+        String link = "http://localhost:3000/reset-password?token=" + updatePassword.getToken();
+        System.out.println(link);
         return new MessageResponse("Created!");
     }
 
     public MessageResponse updatePassword(PasswordRequest passwordRequest, String id){
-        UpdatePassword updatePassword = updatePasswordRepository.findById(UUID.fromString(id)).orElseThrow(() -> new UserNotFoundException("Error in updating password."));
+        UpdatePassword updatePassword = updatePasswordRepository.findByToken(id).orElseThrow(() -> new UserNotFoundException("Error in updating password."));
         if(updatePassword.getExpires().isBefore(LocalDateTime.now())){
             updatePasswordRepository.delete(updatePassword);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expired");

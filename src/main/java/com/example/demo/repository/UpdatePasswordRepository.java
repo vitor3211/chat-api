@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -16,5 +17,7 @@ public interface UpdatePasswordRepository extends JpaRepository<UpdatePassword,U
     @Transactional
     @Query(value = "DELETE FROM password_reset WHERE expires < NOW();", nativeQuery = true)
     void deleteNonVerifiedUsers();
+
+    Optional<UpdatePassword> findByToken(String token);
 
 }
