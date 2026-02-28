@@ -30,7 +30,6 @@ public class ChatController {
             @DestinationVariable String roomId,
             @Payload MessageRequest messageRequest
     ) throws Exception {
-        // Em vez de usar Authentication (que dá erro), usamos o sender que o React envia
         return chatService.sendMessage(messageRequest.sender(), roomId, messageRequest);
     }
 }

@@ -23,40 +23,6 @@ public class RoomService {
         this.messageRepository = messageRepository;
     }
 
-//    public Room createNewRoom(String id){
-//        if(roomRepository.findByRoomID(id) != null){
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Room already exists!");
-//        }
-//
-//        Room room = new Room();
-//        room.setRoomID(id);
-//        roomRepository.save(room);
-//        return room;
-//    }
-//
-//    public Room joinRoom(String id){
-//        Room room = roomRepository.findByRoomID(id);
-//        if(room == null){
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found!");
-//        }
-//        return room;
-//    }
-//
-//    public List<Message> getMessages(String id, int page, int size){
-//        Room room = roomRepository.findByRoomID(id);
-//        if(room == null){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "");
-//        }
-//
-//        List<Message> messages = room.getMessages();
-//        int start = Math.max(0, messages.size() - (page + 1) * size);
-//        int end = Math.min(messages.size(), start + size);
-//        messages = messages.subList(start, end);
-//
-//        return messages;
-//
-//    }
-
     public Room createOrGetRoom(String userId, String contactId) {
         String first = userId.compareTo(contactId) < 0 ? userId : contactId;
         String second = userId.compareTo(contactId) < 0 ? contactId : userId;
