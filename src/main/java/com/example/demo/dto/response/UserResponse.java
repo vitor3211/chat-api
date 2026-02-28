@@ -1,4 +1,4 @@
-package com.example.demo.DTO.response;
+package com.example.demo.dto.response;
 
 import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;

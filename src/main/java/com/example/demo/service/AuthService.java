@@ -9,6 +9,7 @@ import com.example.demo.entity.tokens.UserVerify;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserProvider;
 import com.example.demo.entity.enums.UserRole;
+import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.exception.UserAlreadyExistsException;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.exception.UserNotVerifiedException;
@@ -62,8 +63,8 @@ public class AuthService {
 
             return new AuthorizationResponse(jwtValue, refreshToken.getToken(), 900L);
 
-        } catch(BadCredentialsException e){
-            throw new BadCredentialsException("Invalid email or password!");
+        } catch(Exception e){
+            throw new InvalidCredentialsException("Invalid email or password!");
         }
     }
 

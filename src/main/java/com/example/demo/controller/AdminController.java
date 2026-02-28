@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.request.UserRequest;
-import com.example.demo.DTO.response.MessageResponse;
-import com.example.demo.DTO.response.UserResponse;
+import com.example.demo.dto.request.UserRequest;
+import com.example.demo.dto.response.MessageResponse;
+import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

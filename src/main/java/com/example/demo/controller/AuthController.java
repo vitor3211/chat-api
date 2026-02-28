@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.request.*;
-import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.DTO.response.MessageResponse;
+import com.example.demo.dto.request.*;
+import com.example.demo.dto.response.AuthorizationResponse;
+import com.example.demo.dto.response.MessageResponse;
 import com.example.demo.service.AuthService;
 import com.example.demo.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;

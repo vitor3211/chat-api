@@ -1,9 +1,9 @@
 package com.example.demo.mapper;
 
-import com.example.demo.DTO.request.RegisterRequest;
-import com.example.demo.DTO.request.UserRequest;
-import com.example.demo.DTO.response.UserLoginResponse;
-import com.example.demo.DTO.response.UserResponse;
+import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.dto.request.UserRequest;
+import com.example.demo.dto.response.UserLoginResponse;
+import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

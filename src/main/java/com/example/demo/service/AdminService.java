@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.request.RegisterRequest;
-import com.example.demo.DTO.request.UserRequest;
-import com.example.demo.DTO.response.MessageResponse;
-import com.example.demo.DTO.response.UserResponse;
+import com.example.demo.dto.request.RegisterRequest;
+import com.example.demo.dto.request.UserRequest;
+import com.example.demo.dto.response.MessageResponse;
+import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.UserRole;
 import com.example.demo.exception.UserNotFoundException;

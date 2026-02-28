@@ -18,32 +18,34 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-public class RateLimiterFilter extends OncePerRequestFilter {
+public class RateLimiterFilter /*extends OncePerRequestFilter*/ {
 
-    private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String path = request.getRequestURI();
-        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String ip = request.getRemoteAddr();
-        log.info("IP Address {}: ", ip);
-
-        Bucket bucket = buckets.computeIfAbsent(ip, this::newBucket);
-        if(bucket.tryConsume(1)){
-            filterChain.doFilter(request, response);
-        } else{
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.getWriter().write("Too many requests!");
-        }
-    }
-
-    private Bucket newBucket(String ip){
-        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofSeconds(30)));
-        return Bucket.builder().addLimit(limit).build();
-    }
+    private String oi;
+//
+//    private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();
+//
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//        String path = request.getRequestURI();
+//        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/gs-guide-websocket")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        String ip = request.getRemoteAddr();
+//        log.info("IP Address {}: ", ip);
+//
+//        Bucket bucket = buckets.computeIfAbsent(ip, this::newBucket);
+//        if(bucket.tryConsume(1)){
+//            filterChain.doFilter(request, response);
+//        } else{
+//            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+//            response.getWriter().write("Too many requests!");
+//        }
+//    }
+//
+//    private Bucket newBucket(String ip){
+//        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofSeconds(30)));
+//        return Bucket.builder().addLimit(limit).build();
+//    }
 }

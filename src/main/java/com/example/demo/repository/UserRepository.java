@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ import com.example.demo.entity.User;
 public interface UserRepository extends JpaRepository<User, UUID>{
 
     Optional<User> findByEmail(String email);
+
+    List<User> findAllByIdIn(List<UUID> id);
 
     Boolean existsByName(String name);
 

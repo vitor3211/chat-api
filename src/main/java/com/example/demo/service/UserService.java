@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.response.UserLoginResponse;
+import com.example.demo.dto.response.UserLoginResponse;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.UpdatePasswordRepository;

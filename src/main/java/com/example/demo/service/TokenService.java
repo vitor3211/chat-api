@@ -1,8 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.request.RefreshRequest;
-import com.example.demo.DTO.response.AuthorizationResponse;
-import com.example.demo.DTO.response.UserLoginResponse;
+import com.example.demo.dto.request.RefreshRequest;
+import com.example.demo.dto.response.AuthorizationResponse;
 import com.example.demo.entity.tokens.RefreshToken;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.UserMapper;

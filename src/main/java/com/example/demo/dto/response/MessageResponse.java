@@ -1,4 +1,4 @@
-package com.example.demo.DTO.response;
+package com.example.demo.dto.response;
 
 public record MessageResponse(String message) {
 }

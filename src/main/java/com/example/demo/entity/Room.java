@@ -2,10 +2,10 @@ package com.example.demo.entity;
 
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,8 +16,9 @@ public class Room {
 
     @Id
     private String id;
-    private String roomID;
-    private List<String> participants = new ArrayList<>();
-    private List<Message> messages = new ArrayList<>();
+    private String user1;
+    private String user2;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
 }
