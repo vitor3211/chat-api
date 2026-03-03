@@ -7,7 +7,9 @@ import com.example.demo.entity.User;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.RefreshTokenRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -61,8 +63,9 @@ public class TokenService {
         RefreshToken oldToken = refreshTokenRepository.findByToken(refreshToken.refreshToken()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tokens!"));
         if(oldToken.getExpires().isBefore(Instant.now())){
             refreshTokenRepository.delete(oldToken);
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is expired!");
         }
+        if(oldToken.isRevoked()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is revoked!");
         User user = oldToken.getUser();
         String newAcessToken = generateToken(user);
         RefreshToken newRefreshToken = generateRefreshToken(oldToken.getUser());
@@ -71,4 +74,15 @@ public class TokenService {
         return new AuthorizationResponse(newAcessToken, newRefreshToken.getToken(), 900L);
     }
 
+    public void revokeToken(String refreshToken){
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token not found!")
+        );
+        token.setRevoked(true);
+    }
+
+    public String getId(Authentication authentication){
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        return jwt.getClaimAsString("sub");
+    }
 }

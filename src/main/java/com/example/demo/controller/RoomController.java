@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,20 +27,12 @@ public class RoomController {
             @Valid @RequestBody RoomRequest contactId,
             Authentication authentication
     ){
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = jwt.getClaimAsString("sub");
-
-        Room room = roomService.createOrGetRoom(userId, contactId.contactId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(room);
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createNewRoom(contactId.contactId(), authentication));
     }
 
     @GetMapping
     public ResponseEntity<List<Room>> getUserRooms(Authentication authentication){
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = jwt.getClaimAsString("sub");
-
-        List<Room> rooms = roomService.getRoomsByUserId(userId);
-        return ResponseEntity.ok(rooms);
+        return ResponseEntity.ok(roomService.getRoomsByUserId(authentication));
     }
 
     @GetMapping("/{roomId}/messages")
@@ -51,11 +42,25 @@ public class RoomController {
             @RequestParam(value = "size", defaultValue = "20") int size,
             Authentication authentication
     ){
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = jwt.getClaimAsString("sub");
+        return ResponseEntity.ok(roomService.getMessages(roomId, page, size, authentication));
+    }
 
-        List<Message> messages = roomService.getMessages(roomId, userId, page, size);
-        return ResponseEntity.ok(messages);
+    @DeleteMapping("/{contactId}")
+    public ResponseEntity<Void> deleteRoom(
+            @PathVariable("contactId") String contactId,
+            Authentication authentication
+    ){
+        roomService.deleteRoom(contactId, authentication);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<Void> deleteMessage(
+            @PathVariable("messageId") String messageId,
+            Authentication authentication
+    ){
+        roomService.deleteMessage(messageId, authentication);
+        return ResponseEntity.noContent().build();
     }
 
 }
