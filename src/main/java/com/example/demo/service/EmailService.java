@@ -5,6 +5,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
+import java.util.Hashtable;
+
 @Service
 public class EmailService {
 
@@ -28,6 +33,25 @@ public class EmailService {
             return "Email submitted!";
         } catch (Exception e) {
             return "Failed to send email.";
+        }
+    }
+
+    public boolean validateEmail(String email){
+        try{
+            String[] parts = email.split("@");
+            if(parts.length != 2) return false;
+            String domain = parts[1];
+
+            Hashtable<String, String> env = new Hashtable<>();
+            env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+            InitialDirContext ictx = new InitialDirContext(env);
+
+            Attributes attrs = ictx.getAttributes(domain, new String[]{"MX"});
+            Attribute attr = attrs.get("MX");
+
+            return (attr != null && attr.size() > 0);
+        } catch (Exception e) {
+            return false;
         }
     }
 }

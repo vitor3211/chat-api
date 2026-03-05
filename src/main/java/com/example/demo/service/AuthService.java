@@ -70,14 +70,17 @@ public class AuthService {
 
     //corrigir envio de email na hora da apresentação
     public MessageResponse register(RegisterRequest registerRequest){
-        User user = userMapper.toEntity(registerRequest);
 
-        if(userRepository.existsByEmail(user.getEmail())){
+        if(userRepository.existsByEmail(registerRequest.email())){
             throw new UserAlreadyExistsException("This email is already in use!");
         }
-        if(userRepository.existsByName(user.getName())){
+        if(userRepository.existsByName(registerRequest.name())){
             throw new UserAlreadyExistsException("This Username is already in use!");
         }
+
+        if(!(emailService.validateEmail(registerRequest.email()))) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid domain!");
+
+        User user = userMapper.toEntity(registerRequest);
         user.setUserRole(UserRole.USER);
         user.setUserProvider(UserProvider.LOCAL);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
