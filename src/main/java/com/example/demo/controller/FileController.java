@@ -4,8 +4,13 @@ import com.example.demo.dto.response.UploadFileResponse;
 import com.example.demo.entity.User;
 import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.RateLimiter;
 import com.example.demo.service.CloudinaryService;
+import com.example.demo.service.FileService;
+import com.example.demo.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,20 +24,17 @@ import java.util.UUID;
 @RequestMapping("/files")
 public class FileController {
 
-    private final UserRepository userRepository;
-    private final CloudinaryService cloudinaryService;
+    private final FileService fileService;
 
-    public FileController(UserRepository userRepository,CloudinaryService cloudinaryService){
-        this.userRepository = userRepository;
-        this.cloudinaryService = cloudinaryService;
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
     }
 
     @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam String id){
-        User user = userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new UserNotFoundException("Invalid id!"));
-        String fileUrl = cloudinaryService.uploadFile(file);
-        user.setImageProfileUrl(fileUrl);
-        return new UploadFileResponse(file.getOriginalFilename(), fileUrl, file.getContentType(), file.getSize());
+    @RateLimiter(capacity = 10, refillTokens = 10, refillDurationSeconds = 600)
+    public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file, Authentication authentication){
+        fileService.uploadFile(file, authentication);
+        return ResponseEntity.ok().build();
     }
 
 }
