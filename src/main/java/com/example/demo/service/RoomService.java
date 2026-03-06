@@ -6,6 +6,9 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,12 @@ public class RoomService {
         this.tokenService = tokenService;
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "rooms", key = "@tokenService.getId(#authentication)"),
+                    @CacheEvict(value = "rooms", key = "#contactId")
+            }
+    )
     public Room createNewRoom( String contactId, Authentication authentication) {
 
         String userId = tokenService.getId(authentication);
@@ -52,6 +61,7 @@ public class RoomService {
         return room;
     }
 
+    @Cacheable(value = "rooms", key = "@tokenService.getId(#authentication)")
     public List<Room> getRoomsByUserId(Authentication authentication) {
         String userId = tokenService.getId(authentication);
         return roomRepository.findByUser1OrUser2(userId, userId);
@@ -70,9 +80,15 @@ public class RoomService {
         return messageRepository.findByRoomId(roomId, pageRequest);
     }
 
-    public void deleteRoom(String user2Id, Authentication authentication){
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "rooms", key = "@tokenService.getId(#authentication)"),
+                    @CacheEvict(value = "rooms", key = "#contactId")
+            }
+    )
+    public void deleteRoom(String contactId, Authentication authentication){
         String userId = tokenService.getId(authentication);
-        Room room = roomRepository.findByUser1AndUser2(user2Id, userId).orElseThrow(
+        Room room = roomRepository.findByUser1AndUser2(userId, contactId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found!")
         );
         roomRepository.delete(room);
