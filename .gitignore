@@ -35,5 +35,5 @@ build/
 ### Log path ###
 logs
 
-### Images ###
-uploads
+### env ###
+.env

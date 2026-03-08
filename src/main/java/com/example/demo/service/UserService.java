@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.response.UserLoginResponse;
 import com.example.demo.entity.User;
+import com.example.demo.exception.UserNotFoundException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.repository.UpdatePasswordRepository;
 import com.example.demo.repository.EmailVerifyRepository;
@@ -33,7 +34,8 @@ public class UserService {
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String id = jwt.getClaimAsString("sub");
-        User user = userRepository.findById(UUID.fromString(id)).get();
+        User user = userRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
         return userMapper.toUserLoginResponse(user);
 
     }
