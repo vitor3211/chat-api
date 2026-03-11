@@ -27,5 +27,6 @@ public class FileService {
         User user = userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new UserNotFoundException("Invalid id!"));
         String fileUrl = cloudinaryService.uploadFile(file);
         user.setImageProfileUrl(fileUrl);
+        userRepository.save(user);
     }
 }

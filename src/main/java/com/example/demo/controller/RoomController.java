@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.request.MessageRequest;
 import com.example.demo.dto.request.RoomRequest;
 import com.example.demo.entity.Message;
 import com.example.demo.entity.Room;
@@ -28,6 +29,11 @@ public class RoomController {
             Authentication authentication
     ){
         return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createNewRoom(contactId.contactId(), authentication));
+    }
+
+    @PostMapping("/name")
+    public ResponseEntity<Room> getNewContactWithName(@Valid @RequestBody RoomRequest request, Authentication authentication){
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createNewRoomWithUserName(request, authentication));
     }
 
     @GetMapping

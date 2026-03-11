@@ -67,7 +67,6 @@ public class AuthService {
         }
     }
 
-    //corrigir envio de email na hora da apresentação
     public MessageResponse register(RegisterRequest registerRequest){
 
         if(userRepository.existsByEmail(registerRequest.email())){
@@ -91,8 +90,15 @@ public class AuthService {
         userVerify.setUser(user);
         userVerify.setToken(UUID.randomUUID().toString().replace("-","").substring(0,8));
         userVerify.setExpires(LocalDateTime.now().plusMinutes(15));
-        System.out.println(userVerify.getToken());
         emailVerifyRepository.save(userVerify);
+
+        String subject = "Verify your account";
+        String message = "Hello, " + registerRequest.name() + "\n\n" +
+                "Your registration was successful!\n" +
+                "To activate your account, please use the verification code below:\n\n" +
+                "CODE: " + userVerify.getToken() + "\n\n" +
+                "This code expires in 15 minutes.";
+        emailService.sendEmail(registerRequest.email(), subject, message);
 
         return new MessageResponse("User registered successfully!");
     }
@@ -138,7 +144,16 @@ public class AuthService {
         updatePasswordRepository.save(updatePassword);
 
         String link = "http://localhost:3000/reset-password?token=" + updatePassword.getToken();
-        System.out.println(link);
+
+        String subject = "Password Reset";
+        String message = "Hello,\n\n" +
+                "We received a request to reset the password for your account.\n" +
+                "To proceed with the reset, please click the link below:\n\n" +
+                link + "\n\n" +
+                "If you did not request this, please ignore this email.\n" +
+                "This link will remain active for a limited time.";
+        emailService.sendEmail(user.getEmail(), subject, message);
+
         return new MessageResponse("Created!");
     }
 
@@ -151,6 +166,7 @@ public class AuthService {
         User user = updatePassword.getUser();
         user.setPassword(passwordEncoder.encode(passwordRequest.password()));
         userRepository.save(user);
+        updatePasswordRepository.delete(updatePassword);
 
         return new MessageResponse("Password changed!");
     }

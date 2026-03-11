@@ -27,7 +27,6 @@ public class ChatController {
 
     @MessageMapping("/sendMessage/{roomId}")
     @SendTo("/topic/chat/{roomId}")
-    @RateLimiter(capacity = 40, refillTokens = 40, refillDurationSeconds = 60)
     public Message sendMessage(
             @DestinationVariable String roomId,
             @Payload MessageRequest messageRequest

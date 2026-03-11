@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,6 +11,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import java.util.Hashtable;
 
+@Slf4j
 @Service
 public class EmailService {
 
@@ -32,6 +34,8 @@ public class EmailService {
             javaMailSender.send(simpleMailMessage);
             return "Email submitted!";
         } catch (Exception e) {
+            log.warn("Failed to send email for: {}", recipient);
+            System.out.println(e);
             return "Failed to send email.";
         }
     }

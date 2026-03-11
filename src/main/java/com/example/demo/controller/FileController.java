@@ -31,7 +31,6 @@ public class FileController {
     }
 
     @PostMapping("/uploadFile")
-    @RateLimiter(capacity = 10, refillTokens = 10, refillDurationSeconds = 600)
     public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file, Authentication authentication){
         fileService.uploadFile(file, authentication);
         return ResponseEntity.ok().build();

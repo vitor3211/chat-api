@@ -1,11 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.request.MessageRequest;
+import com.example.demo.dto.request.RoomRequest;
 import com.example.demo.entity.Message;
 import com.example.demo.entity.Room;
 import com.example.demo.entity.User;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.UserRepository;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -61,6 +64,38 @@ public class RoomService {
         return room;
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "rooms", key = "@tokenService.getId(#authentication)"),
+                    @CacheEvict(
+                            value = "rooms",
+                            key = "#result.user1 == @tokenService.getId(#authentication) ? #result.user2 : #result.user1",
+                            beforeInvocation = false
+                    )
+            }
+    )
+    public Room createNewRoomWithUserName(RoomRequest request, Authentication authentication){
+
+        String userId = tokenService.getId(authentication);
+        User contact = userRepository.findByName(request.contactId()).orElseThrow(
+                () ->  new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
+        );
+        String contactId = String.valueOf(contact.getId());
+
+        String first = userId.compareTo(contactId) < 0 ? userId : contactId;
+        String second = userId.compareTo(contactId) < 0 ? contactId : userId;
+
+        if(first.equals(second)) throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid id!");
+        Optional<Room> existingRoom = roomRepository.findByUser1AndUser2(first, second);
+        if (existingRoom.isPresent()) throw new ResponseStatusException(HttpStatus.CONFLICT,"Contact already is in use");
+
+        Room room = new Room();
+        room.setUser1(first);
+        room.setUser2(second);
+        roomRepository.save(room);
+        return room;
+    }
+
     @Cacheable(value = "rooms", key = "@tokenService.getId(#authentication)")
     public List<Room> getRoomsByUserId(Authentication authentication) {
         String userId = tokenService.getId(authentication);
@@ -88,7 +123,10 @@ public class RoomService {
     )
     public void deleteRoom(String contactId, Authentication authentication){
         String userId = tokenService.getId(authentication);
-        Room room = roomRepository.findByUser1AndUser2(userId, contactId).orElseThrow(
+        String first = userId.compareTo(contactId) < 0 ? userId : contactId;
+        String second = userId.compareTo(contactId) < 0 ? contactId : userId;
+
+        Room room = roomRepository.findByUser1AndUser2(first, second).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found!")
         );
         roomRepository.delete(room);
