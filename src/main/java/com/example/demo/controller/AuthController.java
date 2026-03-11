@@ -28,23 +28,12 @@ public class AuthController {
     @PostMapping("/login")
     @RateLimiter(capacity = 5, refillTokens = 2, refillDurationSeconds = 60)
     public ResponseEntity<AuthorizationResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request){
-        try{
-            String ip = request.getHeader("X-Forwarded-For");
-            if (ip == null || ip.isEmpty()) {
-                ip = request.getRemoteAddr();
-            }
-            String clientIp = ip.split(",")[0].trim();
-            log.info("Tentativa de login para: {} com ip: {}", loginRequest.email(), clientIp);
-        } catch (Exception e) {
-            throw new RuntimeException("Deu erro");
-        }
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping("/register")
     @RateLimiter(capacity = 3, refillTokens = 1, refillDurationSeconds = 60)
     public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
-        log.info("Tentativa de registro para usuário: {}, {}", registerRequest.name(), registerRequest.email());
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 

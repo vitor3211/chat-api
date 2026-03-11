@@ -28,12 +28,6 @@ public class AdminController {
         return ResponseEntity.ok(adminService.listAllUsers());
     }
 
-    //pensar nisso depois
-//    @PostMapping("/createUser")
-//    public String createUser(@Valid ){
-//        return adminService.ola();
-//    }
-
     @PutMapping("/updateUser/{uuid}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable UUID uuid,
