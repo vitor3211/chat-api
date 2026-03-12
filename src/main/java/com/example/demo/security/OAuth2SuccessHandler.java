@@ -50,6 +50,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         RefreshToken refreshToken = tokenService.generateRefreshToken(user);
         AuthorizationResponse authResponse = new AuthorizationResponse(token, refreshToken.getToken(), 900L);
 
+        String frontendUrl = System.getenv("FRONTEND_URL");
         response.setContentType("text/html;charset=UTF-8");
         String html = "<!DOCTYPE html><html><head><title>Autenticando...</title></head><body>" +
                 "<script type=\"text/javascript\">" +
@@ -58,7 +59,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 "        refreshToken: '" + refreshToken.getToken() + "'," +
                 "        expiresIn: 900" +
                 "    };" +
-                "    window.opener.postMessage(data, 'http://localhost:3000');" +
+                "    window.opener.postMessage(data, '"+ frontendUrl +"');" +
                 "    window.close();" +
                 "</script>" +
                 "</body></html>";
