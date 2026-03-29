@@ -13,6 +13,9 @@ A arquitetura foi pensada para refletir cenários reais de produção, integrand
 
 Este trabalho demonstra a aplicação prática de conceitos avançados de backend, incluindo testes automatizados com JUnit 5, versionamento de banco de dados com Flyway e gestão de mídia via Cloudinary, sempre pautado pelas melhores práticas de Clean Code e segurança da informação.
 
+## Frontend
+O frontend da aplicação pode ser acessado no seguinte repositório: https://github.com/vitor3211/chat-api-frontend
+
 ---
 
 ## Funcionalidades
@@ -143,6 +146,3 @@ PUB  /app/sendMessage/{roomId}
 
 SUB  /topic/chat/{roomId}
 ```
-
-## Observações
-* Ainda irei terminar o frontend da aplicação.
